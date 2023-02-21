@@ -20,7 +20,6 @@
 
 	$: enheter = [];
 	$: loading = true
-	$: rating = 1
 
     let searchTerm = '';
     $: filteredEnheter = enheter.filter(
@@ -36,7 +35,10 @@
 		fetch('https://data.brreg.no/enhetsregisteret/api/enheter?size=1000')
 			.then((response) => response.json())
 			.then((response) => {
-				enheter = response._embedded.enheter;
+				enheter = response._embedded.enheter.map((enhet) => ({
+					...enhet,
+					rating: 0 // default rating value
+				}));
 			})
 			.then(() => loading = false)
 	}
@@ -60,6 +62,7 @@
 	{#if loading}
 		<Spinner color="red"/>
 	{:else}
+	{console.log(enheter)}
 
 		<TableSearch placeholder="Søk etter navn på bedriften" hoverable={true} bind:inputValue={searchTerm}>
 			<TableHead>
@@ -75,8 +78,8 @@
 					<TableBodyCell>{enhet.navn}</TableBodyCell>
 					<TableBodyCell>({enhet.organisasjonsform.kode}) {enhet.organisasjonsform.beskrivelse}</TableBodyCell>
 					<TableBodyCell>
-					<Rating total={5} rating={rating}>
-						<p slot="text" class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{rating}/5</p>
+					<Rating total={5} rating={enhet.rating}>
+						<p slot="text" class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{enhet.rating}/5</p>
 						<span slot="ratingUp">
 							<FaceFrown class="w-6 h-6 text-red-500 dark:text-red-700"></FaceFrown>
 						</span>
