@@ -1,16 +1,31 @@
 <script>
-	import { Rating, Spinner } from 'flowbite-svelte';
-	import { FaceFrown } from "svelte-heros-v2";
+// @ts-nocheck
+
+	import {
+		Button,
+		Rating,
+		Spinner,
+        Table,
+        TableBody,
+        TableBodyCell,
+        TableBodyRow,
+        TableHead,
+        TableHeadCell,
+        TableSearch
+	} from 'flowbite-svelte';
+	import { FaceFrown, ArrowPathRoundedSquare} from "svelte-heros-v2";
 	import welcome from '$lib/images/svelte-welcome.webp';
 	import welcome_fallback from '$lib/images/svelte-welcome.png';
 	import { onMount } from 'svelte';
-	
-	/**
-	 * @type {any}
-	 */
+
 	$: enheter = [];
 	$: loading = true
 	$: rating = 1
+
+    let searchTerm = '';
+    $: filteredEnheter = enheter.filter(
+      (enhet) => enhet.navn.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
+    );
 
 	onMount(async () => {
 		getEnheter()
@@ -34,38 +49,32 @@
 
 <section>
 	<h1>
-		<span class="welcome">
-			<picture>
-				<source srcset={welcome} type="image/webp" />
-				<img src={welcome_fallback} alt="Welcome" />
-			</picture>
-		</span>
 
-		to your new<br />SvelteKit app
+		Velkommen til bedriftoversikten!
 	</h1>
+	<Button on:click={getEnheter} class="mt-5">
+		Refresh
+	</Button>
 
-	<h2>
-		try editing <strong>src/routes/+page.svelte</strong>
-	</h2>
-	<button on:click={getEnheter}>Refresh</button>
+	<Table class="mt-10"/>
 	{#if loading}
 		<Spinner color="red"/>
 	{:else}
-		<table>
-			<tr>
-				<th>organisasjonsnummer</th>
-				<th>navn</th>
-				<th>organisasjonsform</th>
-				<th>
-					Hvor dårlig er denne bedriften?
-				</th>
-			</tr>
-			{#each enheter as enhet, i}
-			<tr>
-				<td>{enhet.organisasjonsnummer}</td>
-				<td>{enhet.navn}</td>
-				<td>({enhet.organisasjonsform.kode}) {enhet.organisasjonsform.beskrivelse}</td>
-				<td>
+
+		<TableSearch placeholder="Søk etter navn på bedriften" hoverable={true} bind:inputValue={searchTerm}>
+			<TableHead>
+				<TableHeadCell>organisasjonsnummer</TableHeadCell>
+				<TableHeadCell>navn</TableHeadCell>
+				<TableHeadCell>organisasjonsform</TableHeadCell>
+				<TableHeadCell>Hvor dårlig er denne bedriften?</TableHeadCell>
+			</TableHead>
+			<TableBody class="divide-y">
+				{#each filteredEnheter as enhet}
+				<TableBodyRow>
+					<TableBodyCell>{enhet.organisasjonsnummer}</TableBodyCell>
+					<TableBodyCell>{enhet.navn}</TableBodyCell>
+					<TableBodyCell>({enhet.organisasjonsform.kode}) {enhet.organisasjonsform.beskrivelse}</TableBodyCell>
+					<TableBodyCell>
 					<Rating total={5} rating={rating}>
 						<p slot="text" class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{rating}/5</p>
 						<span slot="ratingUp">
@@ -75,10 +84,11 @@
 							<FaceFrown class="w-6 h-6 text-gray-300 dark:text-gray-500"></FaceFrown>
 						</span>
 					</Rating>
-				</td>
-			</tr>
-			{/each}
-		</table>
+				</TableBodyCell>
+				</TableBodyRow>
+				{/each}
+			</TableBody>
+		</TableSearch>
 	{/if}
 
 </section>
