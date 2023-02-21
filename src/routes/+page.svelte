@@ -14,8 +14,6 @@
         TableSearch
 	} from 'flowbite-svelte';
 	import { FaceFrown, ArrowPathRoundedSquare} from "svelte-heros-v2";
-	import welcome from '$lib/images/svelte-welcome.webp';
-	import welcome_fallback from '$lib/images/svelte-welcome.png';
 	import { onMount } from 'svelte';
 
 	$: enheter = [];
@@ -62,8 +60,6 @@
 	{#if loading}
 		<Spinner color="red"/>
 	{:else}
-	{console.log(enheter)}
-
 		<TableSearch placeholder="Søk etter navn på bedriften" hoverable={true} bind:inputValue={searchTerm}>
 			<TableHead>
 				<TableHeadCell>organisasjonsnummer</TableHeadCell>
